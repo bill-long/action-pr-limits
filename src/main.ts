@@ -16,30 +16,30 @@ function handlePullRequest(allowedBranches: string[], forbiddenBranches: string[
 
     let pullRequestEvent = github.context.payload as PullRequestEvent;
 
-    const headRef = pullRequestEvent.pull_request.head.ref.toLowerCase(); // source
-    const baseRef = pullRequestEvent.pull_request.base.ref.toLowerCase(); // target
+    const headLabel = pullRequestEvent.pull_request.head.label.toLowerCase(); // source
+    const baseLabel = pullRequestEvent.pull_request.base.label.toLowerCase(); // target
 
-    core.info(`Pull request #${pullRequestEvent.number}: ${headRef} -> ${baseRef}`);
+    core.info(`Pull request #${pullRequestEvent.number}: ${headLabel} -> ${baseLabel}`);
     core.info(`Allowed Branches: ${JSON.stringify(allowedBranches)}`);
     core.info(`Forbidden Branches: ${JSON.stringify(forbiddenBranches)}`);
 
-    const allowDecision = listContains(headRef, allowedBranches);
-    const denyDecision = listContains(headRef, forbiddenBranches);
+    const allowDecision = listContains(headLabel, allowedBranches);
+    const denyDecision = listContains(headLabel, forbiddenBranches);
 
     if (allowDecision == ListResult.ON_LIST) {
-        core.info(`The pull request is allowed. Branch '${headRef}' has been found on the allowlist.`);
+        core.info(`The pull request is allowed. Branch '${headLabel}' has been found on the allowlist.`);
     } else if (allowDecision == ListResult.NOT_ON_LIST) {
         core.setFailed(
             `The pull request is forbidden. ` +
-            `Branch '${headRef}' hasn't been found on the allowlist for '${baseRef}'.`
+            `Branch '${headLabel}' hasn't been found on the allowlist for '${baseLabel}'.`
         );
     } else if (denyDecision == ListResult.ON_LIST) {
         core.setFailed(
             `The pull request is forbidden. ` +
-            `Branch '${headRef}' has been found on the denylist for '${baseRef}'.`
+            `Branch '${headLabel}' has been found on the denylist for '${baseLabel}'.`
         );
     } else if (denyDecision == ListResult.NOT_ON_LIST) {
-        core.info(`The pull request is allowed. Branch '${headRef}' hasn't been found on the denylist.`);
+        core.info(`The pull request is allowed. Branch '${headLabel}' hasn't been found on the denylist.`);
     }
 }
 
